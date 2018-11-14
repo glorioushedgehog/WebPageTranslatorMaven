@@ -51,68 +51,6 @@ public class HTMLParserTool {
 		writer.print(code.toString());
 		writer.close();
 	}
-
-	public Queue<String>[] convertToTranslatableFormat() throws Exception {
-		
-		Queue<String> htmlCodeList = new LinkedList<>();
-		Queue<String> wordsList = new LinkedList<>();
-		
-		Translator translator = new Translator();
-		PrintWriter writer = new PrintWriter(destFile);
-		int ind = 1;
-		
-		StringBuilder toTrans = new StringBuilder();
-		StringBuilder htmlCode = new StringBuilder();
-		
-		htmlCode.append("<");
-
-		int state = 1;
-		
-		
-		while(ind < sourceCode.length()) {
-			char current = sourceCode.charAt(ind);
-			if(current == '<') {
-				String textToTranslate = toTrans.toString();
-				if(!textToTranslate.trim().equals("")) {
-					wordsList.add(textToTranslate);
-					toTrans = new StringBuilder();
-				}
-				htmlCode.append("\n<");
-				state++;
-			} else if (current == '>') {
-				htmlCode.append(current);
-				if(ind < sourceCode.length() - 1) {
-					if(sourceCode.charAt(ind + 1) != '<') {
-						String code = htmlCode.toString();
-						htmlCodeList.add(code);
-						htmlCode = new StringBuilder();
-					}
-				}
-				state--;
-			} else {
-				if (state == 0) {
-					toTrans.append(current);
-				} else {
-					htmlCode.append(current);
-				}
-			}
-			ind++;
-		}
-		GoogleAPI googleAPI = new GoogleAPI("en");
-		Queue<String> translation = googleAPI.getTranslations(wordsList);
-		while(!htmlCodeList.isEmpty() && !translation.isEmpty()) {
-			writer.print(htmlCodeList.poll());
-			writer.print(translation.poll());
-		}
-		while(!htmlCodeList.isEmpty()) {
-			writer.print(htmlCodeList.poll());
-		}
-		writer.close();
-		Queue[] ret = new Queue[2];
-		ret[0] = htmlCodeList;
-		ret[1] = wordsList;
-		return ret;
-	}
 	
 	public void run() throws Exception {
 		FileExtractor extractor = new FileExtractor(tempFile);
