@@ -22,15 +22,59 @@ public class HTMLParserTool {
         this.targetLang = targetLang;
     }
 
+    String getBaseUrl() {
+        StringBuilder baseURL = new StringBuilder();
+        if (url.startsWith("https://")) {
+            baseURL.append("https://");
+            for (int i = 8; i < url.length(); i++) {
+                if (url.substring(i, i + 1).equals("/")) {
+                    break;
+                }
+                baseURL.append(url, i, i + 1);
+            }
+        } else {
+            for (int i = 0; i < url.length(); i++) {
+                if (url.substring(i, i + 1).equals("/")) {
+                    break;
+                }
+                baseURL.append(url, i, i + 1);
+            }
+        }
+        baseURL.append("/");
+        return String.valueOf(baseURL);
+    }
+
+    String getSourceWithFullLinks(){
+        String baseURL = getBaseUrl();
+        StringBuilder sourceWithFullLinks = new StringBuilder();
+        int i = 0;
+        while (i < sourceCode.length() - 5) {
+            if (sourceCode.substring(i, i + 6).equals("href=\"")) {
+                sourceWithFullLinks.append(sourceCode, i, i + 6);
+                sourceWithFullLinks.append(baseURL);
+                i += 5;
+            } else if (sourceCode.substring(i, i + 5).equals("src=\"")) {
+                sourceWithFullLinks.append(sourceCode, i, i + 5);
+                sourceWithFullLinks.append(baseURL);
+                i += 4;
+            } else {
+                sourceWithFullLinks.append(sourceCode, i, i + 1);
+            }
+            i++;
+        }
+        return String.valueOf(sourceWithFullLinks);
+    }
+
     public void convert() throws Exception {
+        String sourceWithFullLinks = getSourceWithFullLinks();
         GoogleAPI googleAPI = new GoogleAPI(this.targetLang);
         PrintWriter writer = new PrintWriter(destFile);
         int ind = 1;
         StringBuilder toTrans = new StringBuilder();
         StringBuilder code = new StringBuilder("<");
         int state = 1;
-        while (ind < sourceCode.length()) {
-            char current = sourceCode.charAt(ind);
+        while (ind < sourceWithFullLinks.length()) {
+            char current = sourceWithFullLinks.charAt(ind);
             if (current == '<') {
                 String textToTranslate = toTrans.toString();
                 if (!textToTranslate.trim().equals("")) {

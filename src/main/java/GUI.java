@@ -15,17 +15,18 @@ public class GUI extends JFrame implements FocusListener, ActionListener {
     private int NUM_ROWS = 3;
 
     private int WIDTH = 250;
-    private int HEIGHT = 45;
+    private int HEIGHT = 50;
 
     public GUI(){
-        setLayout(new GridLayout(NUM_ROWS, 1));
+        GridLayout grid = new GridLayout(NUM_ROWS, 1);
+        grid.setVgap(20);
+        grid.setHgap(20);
+        setLayout(grid);
 
         input =  new JTextField("Input URL");
         input.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         input.addFocusListener(this);
-
         String[] langs = {"Amharic", "French", "German", "Spanish"};
-
         dropdown = new JComboBox(langs);
         dropdown.setSelectedIndex(0);
         dropdown.addActionListener(this);
@@ -60,12 +61,10 @@ public class GUI extends JFrame implements FocusListener, ActionListener {
 
     public static  void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-        try{
-            new GUI().setVisible(true);
-        } catch (Exception e){
-            System.err.println(e.getMessage());
-        }
+        JFrame frame = new GUI();
+        frame.pack();
+        frame.setLocationRelativeTo(null);  // *** this will center your app ***
+        frame.setVisible(true);
     }
 
     @Override
